@@ -52,6 +52,25 @@ contract MainEventBetting {
    ******************************/
   
   /**
+   * Method for returning the fighters' data for the most recent
+   * event; it's the supplemental function for its sibling function
+   */
+  function getFightersForMostRecentEvent() public view returns (string memory fighter1Name, int fighter1Odds, uint fighter1Id, string memory fighter2Name, int fighter2Odds, uint fighter2Id) {
+    require(events.length > 1);
+
+    Event memory fightEvent = events[events.length - 1];
+    Fighter memory fighter1 = fightEvent.fighter1;
+    Fighter memory fighter2 = fightEvent.fighter2;
+
+    fighter1Name = fighter1.name;
+    fighter1Odds = fighter1.odds;
+    fighter1Id = fighter1.id;
+    fighter2Name = fighter2.name;
+    fighter2Odds = fighter2.odds;
+    fighter2Id = fighter2.id;
+  }
+
+  /**
    * Method for returning the most recent event.
    * It does not return the fighters, since
    * functions can't return structs.  Instead,
