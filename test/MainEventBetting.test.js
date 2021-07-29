@@ -40,5 +40,24 @@ contract('MainEventBetting', (accounts) => {
       assert.equal(parseInt(winner.toString()), 0);
       assert.equal(eventName, 'UFC 266');
     });
-  })
+  });
+
+  describe('getFightersForMostRecentEvent', () => {
+    it('should get the fighter data from the most recent event', async () => {
+      const {
+        fighter1Name,
+        fighter1Odds,
+        fighter1Id,
+        fighter2Name,
+        fighter2Odds,
+        fighter2Id
+      } = await mainEventBetting.getFightersForMostRecentEvent(); 
+      assert.equal(fighter1Name, 'Conor McGregor');
+      assert.equal(parseInt(fighter1Odds.toString()), 225);
+      assert.equal(parseInt(fighter1Id.toString()), 1);
+      assert.equal(fighter2Name, 'Dustin Porier');
+      assert.equal(parseInt(fighter2Odds.toString()), -335);
+      assert.equal(parseInt(fighter2Id.toString()), 2);
+    });
+  });
 });
