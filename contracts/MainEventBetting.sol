@@ -7,6 +7,7 @@ contract MainEventBetting {
 
   string public name = "MainEventBetting";
   address public owner;
+  Event[] events;
 
   /******************************
    * Structs
