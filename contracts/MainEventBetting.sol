@@ -84,8 +84,6 @@ contract MainEventBetting {
     id = fightEvent.id;
     winner = fightEvent.winner;
     eventName = fightEvent.name;
-
-    return (id, winner, eventName);
   }
 
   /**
