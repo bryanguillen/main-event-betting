@@ -66,4 +66,63 @@ contract('MainEventBetting', (accounts) => {
       assert.equal(parseInt(fighter2Id.toString()), 2);
     });
   });
+
+  describe('placeBet', () => {
+    /**
+     * Note: For the event ids for placing bet use 1, since that is the most recent
+     * one, and as of this writing, there is no simple way to a specific event
+     */
+    const EVENT_ID = 1;
+    
+    it('should allow multiple users to place a bet', async () => {
+      await mainEventBetting.placeBet(EVENT_ID, 1, 100, { from: accounts[0] });
+      await mainEventBetting.placeBet(EVENT_ID, 2, 50, { from: accounts[1] });
+      const betForUser1 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[0] });
+      const betForUser2 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[1] });
+      // user 1
+      assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
+      assert.equal(parseInt(betForUser1.amount.toString()), 100);
+      // user 2
+      assert.equal(parseInt(betForUser2.fighterId.toString()), 2);
+      assert.equal(parseInt(betForUser2.amount.toString()), 50);
+    });
+
+    it('should allow a user to place a second bet, if betting on same fighter', async () => {
+      try {
+        await mainEventBetting.placeBet(EVENT_ID, 1, 50, { from: accounts[0] });
+        const betForUser1 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[0] });
+        assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
+        assert.equal(parseInt(betForUser1.amount.toString()), 150);
+      } catch (error) {
+        assert.ok(false, 'User should be able to add more to bet');
+      }
+    });
+
+    it('should not allow a user to place another bet on a different fighter from the original bet', async () => {
+      try {
+        await mainEventBetting.placeBet(EVENT_ID, 2, 50, { from: accounts[0] });
+        assert.ok(false, 'User should not be able to place a bet on a different fighter');
+      } catch (error) {
+        assert.ok(true);
+      }
+    });
+
+    it('should not allow a user to place a bet if invalid id for event', async () => {
+      try {
+        await mainEventBetting.placeBet(10, 1, 50, { from: accounts[2] });
+        assert.ok(false, 'User should not be able to place a bet on a non-existent event');
+      } catch (error) {
+        assert.ok(true);
+      }
+    });
+    
+    it('should not allow a user to place a bet if invalid id for fighter', async () => {
+      try {
+        await mainEventBetting.placeBet(EVENT_ID, 10, 50, { from: accounts[2] });
+        assert.ok(false, 'User should not be able to place a bet on a non-existent fighter');
+      } catch (error) {
+        assert.ok(true);
+      }
+    });
+  });
 });
