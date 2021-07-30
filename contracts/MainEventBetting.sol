@@ -19,9 +19,9 @@ contract MainEventBetting {
    */
   struct Bet {
     address user;
-    uint idForEvent;
     uint fighterId;
     uint amount;
+    bool exists;
   }
 
   /**
