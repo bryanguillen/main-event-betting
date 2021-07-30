@@ -34,6 +34,7 @@ contract MainEventBetting {
     uint winner;
     string name;
     uint date;
+    mapping (address => Bet) bets;
   }
 
   /**
