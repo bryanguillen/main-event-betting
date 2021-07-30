@@ -80,7 +80,16 @@ contract MainEventBetting {
   /**
    * Method for getting bet
    */
-  function getBet(uint idForEvent) public view returns (uint fighterId, uint amount, bool exists) {
+  function getBet(uint idForEvent) public view returns (uint fighterId, uint amount, bool exists, uint indexForBet) {
+    /**
+     * Defaults
+     * Does Solidity handle this already though?
+     */
+    fighterId = 0;
+    amount = 0;
+    exists = false;
+    indexForBet = 0;
+    
     address user = msg.sender;
     Bet[] memory betsForEvent = bets[idForEvent];
 
@@ -89,6 +98,7 @@ contract MainEventBetting {
         fighterId = betsForEvent[i].fighterId;
         amount = betsForEvent[i].amount;
         exists = betsForEvent[i].exists;
+        indexForBet = i;
         break;
       }
     }
@@ -128,5 +138,31 @@ contract MainEventBetting {
     winner = fightEvent.winner;
     eventName = fightEvent.name;
     eventDate = fightEvent.date;
+  }
+
+  /**
+   * Method for making a bet
+   */
+  function placeBet(uint idForEvent, uint fighterId, uint amount) public {
+    require(idForEvent <= eventId - 1); // protect against invalid event
+    
+    address user = msg.sender;
+    (uint originalValueFighterId, uint originalValueAmount, bool exists, uint indexForBet) = getBet(idForEvent);
+
+    if (exists) {
+      /**
+       * Check that the user is not betting on another user
+       */
+      require(fighterId == originalValueFighterId);
+      bets[idForEvent][indexForBet] = Bet(user, originalValueFighterId, (originalValueAmount + amount), true);
+    } else {
+      /**
+       * Check that the user is using valid fighter id
+       */
+      require(fighterId == 1 || fighterId == 2);
+      Bet memory newBet = Bet(user, fighterId, amount, true);
+      bets[idForEvent].push(newBet);
+    }
+
   }
 }
