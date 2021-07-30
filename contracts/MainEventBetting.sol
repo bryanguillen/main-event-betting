@@ -50,6 +50,21 @@ contract MainEventBetting {
   /******************************
    * Methods
    ******************************/
+
+  /**
+   * Method for creating event 
+   */
+  function createEvent(string memory fighter1Name, int fighter1Odds, string memory fighter2Name, int fighter2Odds, string memory eventName, uint eventDate) public {
+    require(msg.sender == owner);
+
+    Fighter memory fighter1 = Fighter(fighter1Name, fighter1Odds, 1);
+    Fighter memory fighter2 = Fighter(fighter2Name, fighter2Odds, 2);
+    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate);
+
+    events.push(fightEvent);
+
+    eventId = eventId + 1;
+  }
   
   /**
    * Method for returning the fighters' data for the most recent
@@ -85,20 +100,5 @@ contract MainEventBetting {
     winner = fightEvent.winner;
     eventName = fightEvent.name;
     eventDate = fightEvent.date;
-  }
-
-  /**
-   * Method for creating event 
-   */
-  function createEvent(string memory fighter1Name, int fighter1Odds, string memory fighter2Name, int fighter2Odds, string memory eventName, uint eventDate) public {
-    require(msg.sender == owner);
-
-    Fighter memory fighter1 = Fighter(fighter1Name, fighter1Odds, 1);
-    Fighter memory fighter2 = Fighter(fighter2Name, fighter2Odds, 2);
-    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate);
-
-    events.push(fightEvent);
-
-    eventId = eventId + 1;
   }
 }
