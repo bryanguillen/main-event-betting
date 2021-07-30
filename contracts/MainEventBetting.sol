@@ -34,6 +34,16 @@ contract MainEventBetting {
     uint winner;
     string name;
     uint date;
+    /**
+     * - usersThatBet: Used at the end for payouts.
+     *   Iterate through list, since can't we can't
+     *   iterate through bets.
+     * - bets: Map for placed bets.  That is used
+     *   rather than array, since getting an array
+     *   of Bet structs was difficult and also,
+     *   this is helpful for when checking if user
+     *   has placed a previous bet.
+     */
     address[] usersThatBet;
     mapping (address => Bet) bets;
   }
