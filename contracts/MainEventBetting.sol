@@ -34,6 +34,7 @@ contract MainEventBetting {
     uint winner;
     string name;
     uint date;
+    address[] usersThatBet;
     mapping (address => Bet) bets;
   }
 
@@ -70,7 +71,7 @@ contract MainEventBetting {
 
     Fighter memory fighter1 = Fighter(fighter1Name, fighter1Odds, 1);
     Fighter memory fighter2 = Fighter(fighter2Name, fighter2Odds, 2);
-    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate);
+    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate, new address[](0));
 
     events.push(fightEvent);
 
