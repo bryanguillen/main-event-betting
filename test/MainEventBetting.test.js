@@ -1,6 +1,12 @@
 const MainEventBetting = artifacts.require("./MainEventBetting.sol");
 
 contract('MainEventBetting', (accounts) => {
+  /**
+   * Mock Event Time: Declared in global scope of test
+   * so that multiple describe blocks below can access
+   * the same number.
+   */
+  const mockEventDate = Date.now();
   let mainEventBetting;
   
   before(async () => {
@@ -9,7 +15,7 @@ contract('MainEventBetting', (accounts) => {
 
   describe('createEvent', () => {
     const createEvent = async (account = accounts[0], fighter1Name = 'Derrick Lewis', fighter2Name = 'Ciryl Gane', eventName = 'UFC 265' ) => {
-      await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, { from: account })
+      await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, mockEventDate, { from: account })
 
     };
 
@@ -35,10 +41,11 @@ contract('MainEventBetting', (accounts) => {
 
   describe('getMostRecentEvent', () => {
     it('should get the most recent event data, excluding the fighter\'s data', async () => {
-      const { id, winner, eventName } = await mainEventBetting.getMostRecentEvent(); 
+      const { id, winner, eventName, eventDate } = await mainEventBetting.getMostRecentEvent(); 
       assert.equal(parseInt(id.toString()), 1);
       assert.equal(parseInt(winner.toString()), 0);
       assert.equal(eventName, 'UFC 266');
+      assert.equal(parseInt(eventDate.toString()), mockEventDate);
     });
   });
 
