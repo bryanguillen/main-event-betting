@@ -9,6 +9,7 @@ contract MainEventBetting {
   address public owner;
   uint eventId;
   Event[] events;
+  mapping (uint => Bet[]) bets;
 
   /******************************
    * Structs
@@ -34,18 +35,6 @@ contract MainEventBetting {
     uint winner;
     string name;
     uint date;
-    /**
-     * - usersThatBet: Used at the end for payouts.
-     *   Iterate through list, since can't we can't
-     *   iterate through bets.
-     * - bets: Map for placed bets.  That is used
-     *   rather than array, since getting an array
-     *   of Bet structs was difficult and also,
-     *   this is helpful for when checking if user
-     *   has placed a previous bet.
-     */
-    address[] usersThatBet;
-    mapping (address => Bet) bets;
   }
 
   /**
@@ -81,11 +70,27 @@ contract MainEventBetting {
 
     Fighter memory fighter1 = Fighter(fighter1Name, fighter1Odds, 1);
     Fighter memory fighter2 = Fighter(fighter2Name, fighter2Odds, 2);
-    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate, new address[](0));
+    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate);
 
     events.push(fightEvent);
 
     eventId = eventId + 1;
+  }
+
+  /**
+   * Method for getting bet
+   */
+  function getBet(uint idForEvent, address user) public view returns (uint fighterId, uint amount, bool exists) {
+    Bet[] memory betsForEvent = bets[idForEvent];
+
+    for (uint i = 0; i < betsForEvent.length; i++) {
+      if (betsForEvent[i].user == user) {
+        fighterId = betsForEvent[i].fighterId;
+        amount = betsForEvent[i].amount;
+        exists = betsForEvent[i].exists;
+        break;
+      }
+    }
   }
   
   /**
