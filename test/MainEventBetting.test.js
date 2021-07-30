@@ -15,8 +15,7 @@ contract('MainEventBetting', (accounts) => {
 
   describe('createEvent', () => {
     const createEvent = async (account = accounts[0], fighter1Name = 'Derrick Lewis', fighter2Name = 'Ciryl Gane', eventName = 'UFC 265' ) => {
-      await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, mockEventDate, { from: account })
-
+      await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, mockEventDate, { from: account });
     };
 
     it('should be able to create an event multiple times', async () => {
