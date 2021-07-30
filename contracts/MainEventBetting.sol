@@ -80,7 +80,8 @@ contract MainEventBetting {
   /**
    * Method for getting bet
    */
-  function getBet(uint idForEvent, address user) public view returns (uint fighterId, uint amount, bool exists) {
+  function getBet(uint idForEvent) public view returns (uint fighterId, uint amount, bool exists) {
+    address user = msg.sender;
     Bet[] memory betsForEvent = bets[idForEvent];
 
     for (uint i = 0; i < betsForEvent.length; i++) {
