@@ -18,12 +18,12 @@ contract MainEventBetting {
    * Struct that represents an event -- a fight
    */
   struct Event {
-    // uint date; comment out for now to keep things simple
     Fighter fighter1;
     Fighter fighter2;
     uint id;
     uint winner;
     string name;
+    uint date;
   }
 
   /**
@@ -76,7 +76,7 @@ contract MainEventBetting {
    * functions can't return structs.  Instead,
    * that is done by another method.
    */
-  function getMostRecentEvent() public view returns (uint id, uint winner, string memory eventName) {
+  function getMostRecentEvent() public view returns (uint id, uint winner, string memory eventName, uint eventDate) {
     require(events.length > 1);
 
     Event memory fightEvent = events[events.length - 1];
@@ -84,17 +84,18 @@ contract MainEventBetting {
     id = fightEvent.id;
     winner = fightEvent.winner;
     eventName = fightEvent.name;
+    eventDate = fightEvent.date;
   }
 
   /**
    * Method for creating event 
    */
-  function createEvent(string memory fighter1Name, int fighter1Odds, string memory fighter2Name, int fighter2Odds, string memory eventName) public {
+  function createEvent(string memory fighter1Name, int fighter1Odds, string memory fighter2Name, int fighter2Odds, string memory eventName, uint eventDate) public {
     require(msg.sender == owner);
 
     Fighter memory fighter1 = Fighter(fighter1Name, fighter1Odds, 1);
     Fighter memory fighter2 = Fighter(fighter2Name, fighter2Odds, 2);
-    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName);
+    Event memory fightEvent = Event(fighter1, fighter2, eventId, 0, eventName, eventDate);
 
     events.push(fightEvent);
 
