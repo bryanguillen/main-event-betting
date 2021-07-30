@@ -15,6 +15,16 @@ contract MainEventBetting {
    ******************************/
 
   /**
+   * Struct that represents a bet for a fight
+   */
+  struct Bet {
+    address user;
+    uint idForEvent;
+    uint fighterId;
+    uint amount;
+  }
+
+  /**
    * Struct that represents an event -- a fight
    */
   struct Event {
