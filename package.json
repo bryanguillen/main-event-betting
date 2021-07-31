@@ -1,0 +1,23 @@
+{
+  "name": "main-event-betting",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bryg217/main-event-betting.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bryg217/main-event-betting/issues"
+  },
+  "homepage": "https://github.com/bryg217/main-event-betting#readme",
+  "devDependencies": {
+    "truffle-assert": "^0.9.1"
+  }
+}
