@@ -1,4 +1,5 @@
 const MainEventBetting = artifacts.require("./MainEventBetting.sol");
+const truffleAssert = require('truffle-assert');
 
 contract('MainEventBetting', (accounts) => {
   /**
@@ -123,6 +124,17 @@ contract('MainEventBetting', (accounts) => {
       } catch (error) {
         assert.ok(true);
       }
+    });
+  });
+
+  describe('fallback payable', () => {
+    it('should increase the balance', async () => {
+      const tx = await mainEventBetting.send(100);
+      truffleAssert.eventEmitted(tx, 'Paid', (event) => {
+        const { from, value } = event;
+        return from === accounts[0] && parseInt(value.toString()) === 100;
+      });
+      assert.equal(parseInt((await mainEventBetting.balance()).toString()), 100);
     });
   });
 });
