@@ -20,7 +20,7 @@ contract MainEventBetting {
    * Struct that represents a bet for a fight
    */
   struct Bet {
-    address user;
+    address payable user;
     uint fighterId;
     uint amount;
     bool exists;
@@ -50,6 +50,8 @@ contract MainEventBetting {
   /******************************
    * Events
    ******************************/
+
+  event BetSubmitted(address from, uint amount, uint fighterId);
 
   /******************************
    * Constructor
@@ -151,7 +153,7 @@ contract MainEventBetting {
   function placeBet(uint idForEvent, uint fighterId, uint amount) public {
     require(idForEvent <= eventId - 1); // protect against invalid event
     
-    address user = msg.sender;
+    address payable user = msg.sender;
     (uint originalValueFighterId, uint originalValueAmount, bool exists, uint indexForBet) = getBet(idForEvent);
 
     if (exists) {
@@ -168,5 +170,7 @@ contract MainEventBetting {
       Bet memory newBet = Bet(user, fighterId, amount, true);
       bets[idForEvent].push(newBet);
     }
+
+    emit BetSubmitted(user, amount, fighterId);
   }
 }
