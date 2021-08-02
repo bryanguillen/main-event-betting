@@ -10,7 +10,6 @@ contract MainEventBetting {
   uint eventId;
   Event[] events;
   mapping (uint => Bet[]) bets;
-  uint public balance = 0;
 
   /******************************
    * Structs
