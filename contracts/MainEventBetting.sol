@@ -150,7 +150,7 @@ contract MainEventBetting {
   /**
    * Method for making a bet
    */
-  function placeBet(uint idForEvent, uint fighterId, uint amount) public {
+  function placeBet(uint idForEvent, uint fighterId, uint amount) public payable {
     require(idForEvent <= eventId - 1); // protect against invalid event
     
     address payable user = msg.sender;
