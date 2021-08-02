@@ -9,7 +9,7 @@ contract MainEventBetting {
   address public owner;
   uint eventId;
   Event[] events;
-  mapping (uint => Bet[]) bets;
+  mapping (uint => mapping (address => Bet)) bets;
 
   /******************************
    * Structs
@@ -86,28 +86,12 @@ contract MainEventBetting {
   /**
    * Method for getting bet
    */
-  function getBet(uint idForEvent) public view returns (uint fighterId, uint amount, bool exists, uint indexForBet) {
-    /**
-     * Defaults
-     * Does Solidity handle this already though?
-     */
-    fighterId = 0;
-    amount = 0;
-    exists = false;
-    indexForBet = 0;
-    
-    address user = msg.sender;
-    Bet[] memory betsForEvent = bets[idForEvent];
+  function getBet(uint idForEvent) public view returns (uint fighterId, uint amount, bool exists) {
+    Bet memory betForEvent = bets[idForEvent][msg.sender];
 
-    for (uint i = 0; i < betsForEvent.length; i++) {
-      if (betsForEvent[i].user == user) {
-        fighterId = betsForEvent[i].fighterId;
-        amount = betsForEvent[i].amount;
-        exists = betsForEvent[i].exists;
-        indexForBet = i;
-        break;
-      }
-    }
+    fighterId = betForEvent.fighterId;
+    amount = betForEvent.amount;
+    exists = betForEvent.exists;
   }
   
   /**
@@ -153,21 +137,21 @@ contract MainEventBetting {
     require(idForEvent <= eventId - 1); // protect against invalid event
     
     address payable user = msg.sender;
-    (uint originalValueFighterId, uint originalValueAmount, bool exists, uint indexForBet) = getBet(idForEvent);
+    (uint originalValueFighterId, uint originalValueAmount, bool exists) = getBet(idForEvent);
 
     if (exists) {
       /**
        * Check that the user is not betting on another user
        */
       require(fighterId == originalValueFighterId);
-      bets[idForEvent][indexForBet] = Bet(user, originalValueFighterId, (originalValueAmount + amount), true);
+      bets[idForEvent][user] = Bet(user, originalValueFighterId, (originalValueAmount + amount), true);
     } else {
       /**
        * Check that the user is using valid fighter id
        */
       require(fighterId == 1 || fighterId == 2);
       Bet memory newBet = Bet(user, fighterId, amount, true);
-      bets[idForEvent].push(newBet);
+      bets[idForEvent][user] = newBet;
     }
 
     emit BetSubmitted(user, amount, fighterId);
