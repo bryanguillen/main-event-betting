@@ -76,24 +76,37 @@ contract('MainEventBetting', (accounts) => {
     const EVENT_ID = 1;
     
     it('should allow multiple users to place a bet', async () => {
-      await mainEventBetting.placeBet(EVENT_ID, 1, 100, { from: accounts[0] });
-      await mainEventBetting.placeBet(EVENT_ID, 2, 50, { from: accounts[1] });
-      const betForUser1 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[0] });
-      const betForUser2 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[1] });
-      // user 1
-      assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
-      assert.equal(parseInt(betForUser1.amount.toString()), 100);
-      // user 2
-      assert.equal(parseInt(betForUser2.fighterId.toString()), 2);
-      assert.equal(parseInt(betForUser2.amount.toString()), 50);
+      const bet1 = await mainEventBetting.placeBet(EVENT_ID, 1, 100, { from: accounts[0] });
+      const bet2 = await mainEventBetting.placeBet(EVENT_ID, 2, 50, { from: accounts[1] });
+      truffleAssert.eventEmitted(bet1, 'BetSubmitted', (event) => {
+        const { from, amount, fighterId } = event;
+        return (
+          from === accounts[0] &&
+          parseInt(amount.toString()) === 100 &&
+          parseInt(fighterId.toString()) === 1
+        );
+      });
+      truffleAssert.eventEmitted(bet2, 'BetSubmitted', (event) => {
+        const { from, amount, fighterId } = event;
+        return (
+          from === accounts[1] &&
+          parseInt(amount.toString()) === 50 &&
+          parseInt(fighterId.toString()) === 2
+        );
+      });
     });
 
     it('should allow a user to place a second bet, if betting on same fighter', async () => {
       try {
-        await mainEventBetting.placeBet(EVENT_ID, 1, 50, { from: accounts[0] });
-        const betForUser1 = await mainEventBetting.getBet(EVENT_ID, { from: accounts[0] });
-        assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
-        assert.equal(parseInt(betForUser1.amount.toString()), 150);
+        const bet1 = await mainEventBetting.placeBet(EVENT_ID, 1, 50, { from: accounts[0] });
+        truffleAssert.eventEmitted(bet1, 'BetSubmitted', (event) => {
+          const { from, amount, fighterId } = event;
+          return (
+            from === accounts[0] &&
+            parseInt(amount.toString()) === 50 &&
+            parseInt(fighterId.toString()) === 1
+          );
+        });
       } catch (error) {
         assert.ok(false, 'User should be able to add more to bet');
       }
