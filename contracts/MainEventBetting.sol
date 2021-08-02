@@ -51,8 +51,6 @@ contract MainEventBetting {
    * Events
    ******************************/
 
-  event Paid(address from, uint value);
-
   /******************************
    * Constructor
    ******************************/
@@ -170,14 +168,5 @@ contract MainEventBetting {
       Bet memory newBet = Bet(user, fighterId, amount, true);
       bets[idForEvent].push(newBet);
     }
-  }
-
-  /**
-   * Fallback for payable; first step in placing a bet
-   */
-  function () external payable {
-    uint amount = msg.value;
-    emit Paid(msg.sender, amount);
-    balance += amount;
   }
 }
