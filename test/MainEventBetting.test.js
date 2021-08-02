@@ -139,4 +139,16 @@ contract('MainEventBetting', (accounts) => {
       }
     });
   });
+
+  describe('getBet', () => {
+    it('should get the current bet for an event', async () => {
+      const betForUser1 = await mainEventBetting.getBet(1, { from: accounts[0] });
+      /**
+       * NOTE: For more on where the values below come from, view the tests
+       * above in place bet; specifically the ones that place successful bets.
+       */
+      assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
+      assert.equal(parseInt(betForUser1.amount.toString()), 150);
+    });
+  });
 });
