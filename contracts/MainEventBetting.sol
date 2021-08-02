@@ -10,6 +10,11 @@ contract MainEventBetting {
   uint eventId;
   Event[] events;
   mapping (uint => mapping (address => Bet)) bets;
+  /**
+   * Used to keep an array of all the users that have placed bet(s)
+   * per event.  This is useful for the payout because the contract
+   * could iterate through all users, see who won, and just pay them.
+   */
   mapping (uint => address payable[]) usersThatPlacedBets;
 
   /******************************
