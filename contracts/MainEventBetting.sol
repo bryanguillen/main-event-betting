@@ -10,6 +10,7 @@ contract MainEventBetting {
   uint eventId;
   Event[] events;
   mapping (uint => mapping (address => Bet)) bets;
+  mapping (uint => address payable[]) usersThatPlacedBets;
 
   /******************************
    * Structs
@@ -152,6 +153,7 @@ contract MainEventBetting {
       require(fighterId == 1 || fighterId == 2);
       Bet memory newBet = Bet(user, fighterId, amount, true);
       bets[idForEvent][user] = newBet;
+      usersThatPlacedBets[idForEvent].push(user);
     }
 
     emit BetSubmitted(user, amount, fighterId);
