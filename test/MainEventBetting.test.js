@@ -92,13 +92,13 @@ contract('MainEventBetting', (accounts) => {
     const EVENT_ID = 1;
     
     it('should allow multiple users to place a bet', async () => {
-      const bet1 = await mainEventBetting.placeBet(EVENT_ID, 1, 100, { from: accounts[0] });
-      const bet2 = await mainEventBetting.placeBet(EVENT_ID, 2, 50, { from: accounts[1] });
+      const bet1 = await mainEventBetting.placeBet(EVENT_ID, 1, 10000, { from: accounts[0] });
+      const bet2 = await mainEventBetting.placeBet(EVENT_ID, 2, 5000, { from: accounts[1] });
       truffleAssert.eventEmitted(bet1, 'BetSubmitted', (event) => {
         const { from, amount, fighterId } = event;
         return (
           from === accounts[0] &&
-          parseInt(amount.toString()) === 100 &&
+          parseInt(amount.toString()) === 10000 &&
           parseInt(fighterId.toString()) === 1
         );
       });
@@ -106,7 +106,7 @@ contract('MainEventBetting', (accounts) => {
         const { from, amount, fighterId } = event;
         return (
           from === accounts[1] &&
-          parseInt(amount.toString()) === 50 &&
+          parseInt(amount.toString()) === 5000 &&
           parseInt(fighterId.toString()) === 2
         );
       });
@@ -164,7 +164,7 @@ contract('MainEventBetting', (accounts) => {
        * above in place bet; specifically the ones that place successful bets.
        */
       assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
-      assert.equal(parseInt(betForUser1.amount.toString()), 150);
+      assert.equal(parseInt(betForUser1.amount.toString()), 10050);
     });
   });
 });
