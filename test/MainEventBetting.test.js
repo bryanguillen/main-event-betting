@@ -26,7 +26,7 @@ contract('MainEventBetting', (accounts) => {
       const payout1 = await mainEventBetting.calculatePayout(250, -250);
       const payout2 = await mainEventBetting.calculatePayout(3300, -250);
       assert.equal(parseInt(payout1.toString()), 350);
-      assert.equal(parseInt(payout2.toString()), 45);
+      assert.equal(parseInt(payout2.toString()), 4620);
     });
   });
 
