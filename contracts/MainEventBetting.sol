@@ -86,7 +86,7 @@ contract MainEventBetting {
       payout = ((betAmount / 100) * uint(odds)) + betAmount;
     } else {
       uint oddsAbsoluteValue = uint(odds / -1); // HACK: Get absolute value for int and convert to uint.  Using uint(odds) alone will not get you absolute value.
-      payout = ((betAmount / oddsAbsoluteValue) * 100) + betAmount;
+      payout = ((betAmount * 100 / oddsAbsoluteValue)) + betAmount;
     }
   }
 
