@@ -57,6 +57,7 @@ contract MainEventBetting {
    ******************************/
 
   event BetSubmitted(address from, uint amount, uint fighterId);
+  event SeedMoneyReceived(uint amount);
 
   /******************************
    * Constructor
@@ -188,5 +189,15 @@ contract MainEventBetting {
     }
 
     emit BetSubmitted(user, amount, fighterId);
+  }
+
+  /**
+   * Method that exists to receive payment, which is really only useful for testing
+   * right now.  Essentially, it is used in testing, and can be used in production,
+   * to provide "seed funding" to the contract to ensure that there is always
+   * enough money come payout
+   */
+  function () external payable {
+    emit SeedMoneyReceived(msg.value);
   }
 }
