@@ -8,6 +8,9 @@ contract('MainEventBetting', (accounts) => {
    * the same number.
    */
   const mockEventDate = Date.now();
+  const createEvent = async (account = accounts[0], fighter1Name = 'Derrick Lewis', fighter2Name = 'Ciryl Gane', eventName = 'UFC 265', fighter1Odds = 225, fighter2Odds = -335) => {
+    await mainEventBetting.createEvent(fighter1Name, fighter1Odds, fighter2Name, fighter2Odds, eventName, mockEventDate, { from: account });
+  };
   let mainEventBetting;
   
   before(async () => {
@@ -31,10 +34,6 @@ contract('MainEventBetting', (accounts) => {
   });
 
   describe('createEvent', () => {
-    const createEvent = async (account = accounts[0], fighter1Name = 'Derrick Lewis', fighter2Name = 'Ciryl Gane', eventName = 'UFC 265' ) => {
-      await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, mockEventDate, { from: account });
-    };
-
     it('should be able to create an event multiple times', async () => {
       try {
         await createEvent();
@@ -165,6 +164,54 @@ contract('MainEventBetting', (accounts) => {
        */
       assert.equal(parseInt(betForUser1.fighterId.toString()), 1);
       assert.equal(parseInt(betForUser1.amount.toString()), 10050);
+    });
+  });
+
+  describe('payWinners', () => {
+    const EVENT_ID = 2; // comes from the fact that two other events were created before this test
+    
+    const ownerAccount = accounts[0];
+    const bettor1 = accounts[4];
+    const bettor1Amount = 3000;
+    const bettor2 = accounts[5];
+    const bettor2Amount = 10000;
+    const bettor3 = accounts[6];
+    const bettor3Amount = 5700;
+
+    
+    before(async () => {
+      await mainEventBetting.send(1000000, { from: ownerAccount });
+      
+      bettor1OriginalBalance = await web3.eth.getBalance(bettor1);
+      bettor2OriginalBalance = await web3.eth.getBalance(bettor2);
+      bettor3OriginalBalance = await web3.eth.getBalance(bettor3);
+
+      await createEvent(ownerAccount, 'Colby Covington', 'Kamaru Usman', 'UFC 268', 150, -200);
+
+      await mainEventBetting.placeBet(EVENT_ID, 1, bettor1Amount, { from: bettor1 }); // expected payout 7500; using formula for calculatePayout
+      await mainEventBetting.placeBet(EVENT_ID, 2, bettor2Amount, { from: bettor2 }); // none
+      await mainEventBetting.placeBet(EVENT_ID, 1, bettor3Amount, { from: bettor3 }); // expected payout 8550; using formula for calculatePayout
+    });
+
+    it('should pay all of the winners', async () => {
+      const tx = await mainEventBetting.payWinners(EVENT_ID, 1, { from: ownerAccount });
+
+      truffleAssert.eventEmitted(tx,'WinnersPaid', async () => {
+        /**
+         * For each of the next three variables, the last number added is expected payout.
+         * So, to keep things clean, we first subtract the amount and then add back the total
+         * payout.  Note: For the last number, it was calculated using the formula for calculate payout.
+         */
+        const bettor1ExpectedPayout = bettor1OriginalBalance - bettor1Amount + 7500;
+        const bettor2ExpectedPayout = bettor2OriginalBalance - bettor2Amount + 0;
+        const bettor3ExpectedPayout = bettor3OriginalBalance - bettor3Amount + 8550;
+      
+        return (
+          await web3.eth.getBalance(bettor1) === bettor1ExpectedPayout &&
+          await web3.eth.getBalance(bettor2) === bettor2ExpectedPayout &&
+          await web3.eth.getBalance(bettor3) === bettor3ExpectedPayout
+        );
+      });
     });
   });
 });
