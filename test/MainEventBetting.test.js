@@ -14,6 +14,22 @@ contract('MainEventBetting', (accounts) => {
     mainEventBetting = await MainEventBetting.deployed();
   });
 
+  describe('calculatePayout', () => {
+    it('should calculate payout for plus line', async () => {
+      const payout1 = await mainEventBetting.calculatePayout(100, 250);
+      const payout2 = await mainEventBetting.calculatePayout(3300, 250);
+      assert.equal(parseInt(payout1.toString()), 350);
+      assert.equal(parseInt(payout2.toString()), 11550);
+    });
+    
+    it('should calculate payout for minus line', async () => {
+      const payout1 = await mainEventBetting.calculatePayout(250, -250);
+      const payout2 = await mainEventBetting.calculatePayout(3300, -250);
+      assert.equal(parseInt(payout1.toString()), 350);
+      assert.equal(parseInt(payout2.toString()), 45);
+    });
+  });
+
   describe('createEvent', () => {
     const createEvent = async (account = accounts[0], fighter1Name = 'Derrick Lewis', fighter2Name = 'Ciryl Gane', eventName = 'UFC 265' ) => {
       await mainEventBetting.createEvent(fighter1Name, 225, fighter2Name, -335, eventName, mockEventDate, { from: account });
