@@ -75,7 +75,11 @@ contract MainEventBetting {
    ******************************/
 
   /**
-   * Method for calculating the payout
+   * Method for calculating the payout.  It assumes that the bet amount
+   * is greater than 1000 wei; to avoid working with decimals, this assumption
+   * must be made.  Also, it assumes that the odds are under 1000, in absolute value.
+   * Plus, this should not be an issue, since it is expected that the user would
+   * never want to bet below 1000, in total, for an event.
    */
   function calculatePayout(uint betAmount, int odds) public pure returns (uint payout) {
     if (odds > 0) {
@@ -157,7 +161,7 @@ contract MainEventBetting {
    */
   function placeBet(uint idForEvent, uint fighterId, uint amount) public payable {
     require(idForEvent <= eventId - 1); // protect against invalid event
-    
+
     address payable user = msg.sender;
     (uint originalValueFighterId, uint originalValueAmount, bool exists) = getBet(idForEvent);
 
@@ -172,6 +176,12 @@ contract MainEventBetting {
        * Check that the user is using valid fighter id
        */
       require(fighterId == 1 || fighterId == 2);
+      /**
+       * Check that the bet is larger than a 1000 wei;
+       * this is needed so that the math downsteam, in calculate
+       * payout works properly.  See method for more.
+       */
+      require(amount > 1000);
       Bet memory newBet = Bet(user, fighterId, amount, true);
       bets[idForEvent][user] = newBet;
       usersThatPlacedBets[idForEvent].push(user);
