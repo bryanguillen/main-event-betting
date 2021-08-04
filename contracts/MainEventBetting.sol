@@ -75,6 +75,22 @@ contract MainEventBetting {
    ******************************/
 
   /**
+   * Method for calculating the payout
+   */
+  function calculatePayout(uint betAmount, int odds) public pure returns (uint payout) {
+    if (odds > 0) {
+      /**
+       * If plus line/plus bet; assume bet is over 1000, which is required to avoid
+       * floating point nums
+       */
+      payout = ((betAmount / 100) * uint(odds)) + betAmount;
+    } else {
+      uint oddsAbsoluteValue = uint(odds / -1); // HACK: Get absolute value for int and convert to uint.  Using uint(odds) alone will not get you absolute value.
+      payout = ((betAmount / oddsAbsoluteValue) * 100) + betAmount;
+    }
+  }
+
+  /**
    * Method for creating event 
    */
   function createEvent(string memory fighter1Name, int fighter1Odds, string memory fighter2Name, int fighter2Odds, string memory eventName, uint eventDate) public {
