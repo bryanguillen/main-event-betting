@@ -25,7 +25,6 @@ contract MainEventBetting {
    * Struct that represents a bet for a fight
    */
   struct Bet {
-    address payable user;
     uint fighterId;
     uint amount;
     bool exists;
@@ -58,6 +57,7 @@ contract MainEventBetting {
 
   event BetSubmitted(address from, uint amount, uint fighterId);
   event SeedMoneyReceived(uint amount);
+  event WinnersPaid(uint totalPayout);
 
   /******************************
    * Constructor
@@ -158,6 +158,31 @@ contract MainEventBetting {
   }
 
   /**
+   * Method for paying winners
+   */
+  function payWinners(uint idForEvent, uint winnerFighterId) public {
+    require(msg.sender == owner);
+
+    uint totalPayout;
+    address payable currentBettor;
+    uint currentBettorPayout;
+    address payable[] memory bettors = usersThatPlacedBets[idForEvent];
+    int oddsForWinner = getOddsForWinner(idForEvent, winnerFighterId);
+
+    for (uint i = 0; i < bettors.length; i++) {
+      currentBettor = bettors[i];
+      Bet memory betForUser = bets[idForEvent][currentBettor];
+      if (betForUser.fighterId == winnerFighterId) {
+        currentBettorPayout = calculatePayout(betForUser.amount, oddsForWinner);
+        currentBettor.transfer(currentBettorPayout);
+        totalPayout += currentBettorPayout;
+      }
+    }
+
+    emit WinnersPaid(totalPayout);
+  }
+
+  /**
    * Method for making a bet
    */
   function placeBet(uint idForEvent, uint fighterId, uint amount) public payable {
@@ -171,7 +196,7 @@ contract MainEventBetting {
        * Check that the user is not betting on another user
        */
       require(fighterId == originalValueFighterId);
-      bets[idForEvent][user] = Bet(user, originalValueFighterId, (originalValueAmount + amount), true);
+      bets[idForEvent][user] = Bet(originalValueFighterId, (originalValueAmount + amount), true);
     } else {
       /**
        * Check that the user is using valid fighter id
@@ -183,7 +208,7 @@ contract MainEventBetting {
        * payout works properly.  See method for more.
        */
       require(amount > 1000);
-      Bet memory newBet = Bet(user, fighterId, amount, true);
+      Bet memory newBet = Bet(fighterId, amount, true);
       bets[idForEvent][user] = newBet;
       usersThatPlacedBets[idForEvent].push(user);
     }
@@ -199,5 +224,24 @@ contract MainEventBetting {
    */
   function () external payable {
     emit SeedMoneyReceived(msg.value);
+  }
+
+  /******************************
+   * Helper functions
+   ******************************/
+  function getOddsForWinner(uint idForEvent, uint fighterWinnerId) public view returns (int odds) {
+    Event memory currentEvent;
+
+    for (uint i = 0; i < events.length; i++) {
+      currentEvent = events[i];
+      if (currentEvent.id == idForEvent) {
+        if (fighterWinnerId == 1) {
+          odds = currentEvent.fighter1.odds;
+        } else {
+          odds = currentEvent.fighter2.odds;
+        }
+        break;
+      }
+    }
   }
 }
